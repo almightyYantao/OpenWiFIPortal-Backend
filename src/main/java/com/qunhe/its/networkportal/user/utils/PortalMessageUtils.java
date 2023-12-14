@@ -1,4 +1,4 @@
-package com.qunhe.its.networkportal.utils;
+package com.qunhe.its.networkportal.user.utils;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -16,7 +16,7 @@ import java.util.Arrays;
  */
 @Getter
 @Slf4j
-public class PortalMessageSender {
+public class PortalMessageUtils {
 
     @Setter
     private int timeout = 3000;
@@ -200,9 +200,10 @@ public class PortalMessageSender {
      * @param ip
      * @param portalVer
      * @param authType
+     * @param size      因为有时候认证需要截断长度
      * @return
      */
-    public byte[] init(String ip, int portalVer, int authType) {
+    public byte[] init(String ip, int portalVer, int authType, int size) {
         // 构建portal协议中的字段包
         byte[] ver = new byte[1];
         byte[] type = new byte[1];
@@ -237,7 +238,7 @@ public class PortalMessageSender {
         attrNum[0] = (byte) 0;
 
         // 创建Buff包
-        byte[] buff = new byte[1024];
+        byte[] buff = new byte[size];
         // 给Buff包赋初始值
         buff[0] = ver[0];
         buff[1] = type[0];

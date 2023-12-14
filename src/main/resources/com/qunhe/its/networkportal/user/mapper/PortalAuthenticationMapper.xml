@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qunhe.its.networkportal.user.mapper.PortalAuthenticationMapper">
+
+    <insert id="insert" parameterType="com.qunhe.its.networkportal.user.model.entry.PortalAuthenticationEntry">
+        INSERT INTO portal_authentication (ip, mac, created, type, status, session_id)
+        VALUES (#{ip}, #{mac}, now(), #{type}, 0, #{sessionId})
+    </insert>
+
+    <update id="downlineByIpAndMac" parameterType="map">
+        UPDATE portal_authentication
+        SET status = 1
+        WHERE ip = #{ip}
+          AND mac = #{mac}
+    </update>
+
+    <select id="selectByIpAndSessionId" resultType="com.qunhe.its.networkportal.user.model.entry.PortalAuthenticationEntry" parameterType="map">
+        SELECT * FROM portal_authentication WHERE ip = #{ip} AND session_id = #{sessionId}
+    </select>
+</mapper>

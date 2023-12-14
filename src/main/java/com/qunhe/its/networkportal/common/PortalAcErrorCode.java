@@ -29,7 +29,11 @@ public enum PortalAcErrorCode {
 
     INQUIRY_MESSAGE_SUCCESS(0x0a, 0, "询问消息处理成功"),
     INQUIRY_MESSAGE_UNSUPPORTED(0x0a, 0x01, "询问消息处理失败（不支持该功能）"),
-    INQUIRY_MESSAGE_ERROR(0x0a, 0x02, "询问消息处理失败（发生错误，例如询问消息格式错误）");
+    INQUIRY_MESSAGE_ERROR(0x0a, 0x02, "询问消息处理失败（发生错误，例如询问消息格式错误）"),
+
+    SMS_MESSAGE_ERROR(0x0a, 0x01, "短信验证码错误"),
+
+    WXWORK_MESSAGE_ERROR(0x0a, 0x01, "企业微信认证错误，请联系内部员工进行认证");
 
     private final int type;
     private final int[] validErrCodeValues;

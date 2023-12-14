@@ -1,14 +1,22 @@
-package com.qunhe.its.networkportal.service;
+package com.qunhe.its.networkportal.user.service;
 
 import com.qunhe.its.networkportal.common.PortalAcErrorCode;
 import com.qunhe.its.networkportal.common.PortalException;
-import com.qunhe.its.networkportal.model.MobileAuthReqVo;
-import com.qunhe.its.networkportal.utils.PortalMessageSender;
+import com.qunhe.its.networkportal.user.mapper.PortalAcctOnlineMapper;
+import com.qunhe.its.networkportal.user.mapper.PortalActMapper;
+import com.qunhe.its.networkportal.user.mapper.PortalAuthenticationMapper;
+import com.qunhe.its.networkportal.user.model.MobileAuthReqVo;
+import com.qunhe.its.networkportal.user.model.entry.PortalAcctOnlineEntry;
+import com.qunhe.its.networkportal.user.utils.PortalCacheUtils;
+import com.qunhe.its.networkportal.user.utils.PortalMessageUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author yantao
@@ -16,10 +24,19 @@ import java.net.DatagramSocket;
  */
 @Service
 @Slf4j
-public class LoginService {
+public class PortalLoginService {
 
     private static final String AC_IP = "10.10.200.55";
     private static final Integer AC_PORT = 2000;
+
+    @Autowired
+    private MessageSmsService messageSmsService;
+
+    @Autowired
+    private PortalAuthenticationMapper portalAuthenticationMapper;
+
+    @Autowired
+    private PortalAcctOnlineMapper acctOnlineMapper;
 
     /**
      * 登录认证
@@ -28,9 +45,21 @@ public class LoginService {
      * @throws IOException
      */
     public void loginByChap(MobileAuthReqVo vo) throws IOException, PortalException {
+        if (Objects.equals(vo.getType(), "sms")) {
+            if (!messageSmsService.verificationCode(vo.getLoginName().replace("|sms", ""), vo.getCode())) {
+                throw new PortalException(PortalAcErrorCode.SMS_MESSAGE_ERROR);
+            }
+            PortalCacheUtils.verificationSuccessCache(vo.getLoginName());
+        }
+        if (Objects.equals(vo.getType(), "wxwork")) {
+            if (!"SUCCESS".equals(PortalCacheUtils.getCacheWxWork(vo.getUuid()))) {
+                throw new PortalException(PortalAcErrorCode.WXWORK_MESSAGE_ERROR);
+            }
+            PortalCacheUtils.delCacheWxWork(vo.getUuid());
+        }
         log.info("Received UserInfo:{}", vo);
-        PortalMessageSender sender = new PortalMessageSender();
-        byte[] buff = sender.init(vo.getUserIp(), 1, 0);
+        PortalMessageUtils sender = new PortalMessageUtils();
+        byte[] buff = sender.init(vo.getUserIp(), 1, 0, 1024);
         sender.setTimeout(3000);
         sender.setAcIp(AC_IP);
         sender.setAcPort(AC_PORT);
@@ -67,8 +96,8 @@ public class LoginService {
      */
     public void loginByPap(MobileAuthReqVo vo) throws IOException, PortalException {
         log.info("Received UserInfo:{}", vo);
-        PortalMessageSender sender = new PortalMessageSender();
-        byte[] buff = sender.init(vo.getUserIp(), 1, 1);
+        PortalMessageUtils sender = new PortalMessageUtils();
+        byte[] buff = sender.init(vo.getUserIp(), 1, 1, 1024);
         sender.setTimeout(300000);
         sender.setAcIp(AC_IP);
         sender.setAcPort(AC_PORT);
@@ -90,12 +119,33 @@ public class LoginService {
      * @throws IOException
      */
     public void logout(MobileAuthReqVo vo) throws IOException {
-        PortalMessageSender sender = new PortalMessageSender();
-        byte[] buff = sender.init(vo.getUserIp(), 1, 0);
+        PortalMessageUtils sender = new PortalMessageUtils();
+        byte[] buff = sender.init(vo.getUserIp(), 1, 0, 16);
         sender.setTimeout(3000);
         sender.setAcIp(AC_IP);
         sender.setAcPort(AC_PORT);
         sender.setDataSocket(new DatagramSocket());
         sender.sendLogoutReqAuth(buff);
+    }
+
+    /**
+     * 强制下线
+     *
+     * @param vo
+     * @throws IOException
+     */
+    public void forceLogout(MobileAuthReqVo vo) throws IOException {
+        PortalMessageUtils sender = new PortalMessageUtils();
+        byte[] buff = sender.init(vo.getUserIp(), 1, 0, 16);
+        sender.setTimeout(3000);
+        sender.setAcIp(AC_IP);
+        sender.setAcPort(AC_PORT);
+        sender.setDataSocket(new DatagramSocket());
+        sender.sendLogoutReqAuth(buff);
+        portalAuthenticationMapper.downlineByIpAndMac(vo.getUserIp(), vo.getDeviceMac());
+        List<PortalAcctOnlineEntry> acctOnlineEntrys = acctOnlineMapper.getOnlineByIp(vo.getUserIp());
+        for (PortalAcctOnlineEntry acctOnlineEntry : acctOnlineEntrys) {
+            acctOnlineMapper.updateEndTime(acctOnlineEntry);
+        }
     }
 }

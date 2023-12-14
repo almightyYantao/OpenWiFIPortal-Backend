@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qunhe.its.networkportal.user.mapper.PortalActMapper">
+
+    <insert id="insert" parameterType="com.qunhe.its.networkportal.user.model.entry.PortalActEntry">
+        INSERT INTO portal_act (username, customer_name, uuid)
+        VALUES (#{username}, #{customerName}, #{uuid})
+    </insert>
+
+    <select id="get" parameterType="map" resultType="com.qunhe.its.networkportal.user.model.entry.PortalActEntry">
+        SELECT *
+        from portal_act
+        WHERE uuid = #{uuid}
+    </select>
+</mapper>

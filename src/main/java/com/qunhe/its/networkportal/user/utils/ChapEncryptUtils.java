@@ -1,4 +1,4 @@
-package com.qunhe.its.networkportal.utils;
+package com.qunhe.its.networkportal.user.utils;
 
 
 import lombok.extern.slf4j.Slf4j;

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qunhe.its.networkportal.user.mapper.PortalAcctOnlineMapper">
+
+    <select id="getOnline" parameterType="map" resultType="com.qunhe.its.networkportal.user.model.entry.PortalAcctOnlineEntry">
+        SELECT * FROM portal_acc_online WHERE ip = #{ip} and session_id = #{sessionId} and end_time is null
+    </select>
+
+    <select id="getOnlineByIp" parameterType="map" resultType="com.qunhe.its.networkportal.user.model.entry.PortalAcctOnlineEntry">
+        SELECT * FROM portal_acc_online WHERE ip = #{ip}
+    </select>
+
+    <insert id="insert" parameterType="com.qunhe.its.networkportal.user.model.entry.PortalAcctOnlineEntry">
+        INSERT INTO portal_acc_online(ip,mac,nas_port,session_id,username,start_time,nas_ip)
+        VALUES (#{ip},#{mac},#{nasPort},#{sessionId},#{username},now(),#{nasIp})
+    </insert>
+
+    <update id="updateEndTime" parameterType="com.qunhe.its.networkportal.user.model.entry.PortalAcctOnlineEntry">
+        UPDATE portal_acc_online set end_time = now() WHERE id = #{id}
+    </update>
+</mapper>

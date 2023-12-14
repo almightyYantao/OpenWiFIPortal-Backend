@@ -1,4 +1,4 @@
-package com.qunhe.its.networkportal.model;
+package com.qunhe.its.networkportal.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
