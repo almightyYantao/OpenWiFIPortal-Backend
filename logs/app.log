@@ -1,0 +1,14 @@
+09:43:38.928 [main] INFO  c.q.i.n.NetworkPortalApplication - Starting NetworkPortalApplication using Java 18.0.2 with PID 17716 (/Users/yantao/Desktop/kujiale/code/network-portal/target/classes started by yantao in /Users/yantao/Desktop/kujiale/code/network-portal)
+09:43:38.935 [main] INFO  c.q.i.n.NetworkPortalApplication - The following 1 profile is active: "dev"
+09:43:40.575 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 9090 (http)
+09:43:40.585 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-9090"]
+09:43:40.588 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+09:43:40.589 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.16]
+09:43:40.637 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+09:43:40.637 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1639 ms
+09:43:41.464 [Radius Auth Listener] INFO  org.tinyradius.util.RadiusServer - starting RadiusAuthListener on port 1812
+09:43:41.464 [main] INFO  c.q.i.n.r.s.PortalRadiusService - =======>Radius Server started<=======
+09:43:41.464 [Radius Acct Listener] INFO  org.tinyradius.util.RadiusServer - starting RadiusAcctListener on port 1813
+09:43:42.015 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-9090"]
+09:43:42.032 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 9090 (http) with context path ''
+09:43:42.047 [main] INFO  c.q.i.n.NetworkPortalApplication - Started NetworkPortalApplication in 3.782 seconds (process running for 4.615)
