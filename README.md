@@ -51,8 +51,17 @@ spring.datasource.master.jdbc-url=jdbc:mysql://xxxxx/it_portal
 spring.datasource.master.username=xxxx
 spring.datasource.master.password=xxxx
 mybatis.configuration.map-underscore-to-camel-case=true
+
 ## Radius 配置
 radius.secret=xxxx
+
+## NAS 配置
+nas.ip=xxxxxx
+nas.port=2000
+
+## SMS 配置
+sms.type=url
+sms.url=xxxxx
 
 ## 日志文件配置
 logging.config=classpath:log4j2.xml
