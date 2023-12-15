@@ -5,9 +5,9 @@ import com.qunhe.its.networkportal.user.mapper.PortalAuthenticationMapper;
 import com.qunhe.its.networkportal.user.model.entry.PortalAcctOnlineEntry;
 import com.qunhe.its.networkportal.user.model.entry.PortalAuthenticationEntry;
 import com.qunhe.its.networkportal.user.utils.PortalCacheUtils;
-import com.qunhe.its.networkportal.user.utils.PropertiesUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.tinyradius.packet.AccessRequest;
@@ -26,20 +26,21 @@ import java.net.InetSocketAddress;
 @Slf4j
 public class PortalRadiusService {
 
-    private static final String SECRET = PropertiesUtils.properties.getProperty("radius.secret");
-
     @Autowired
     private PortalAuthenticationMapper portalAuthenticationMapper;
 
     @Autowired
     private PortalAcctOnlineMapper portalAcctOnlineMapper;
 
+    @Value("${radius.secret}")
+    private String radiusSecret;
+
     @Bean
     public RadiusServer radiusServer() {
         RadiusServer radiusServer = new RadiusServer() {
             @Override
             public String getSharedSecret(InetSocketAddress inetSocketAddress) {
-                return SECRET;
+                return radiusSecret;
             }
 
             @Override
@@ -66,16 +67,9 @@ public class PortalRadiusService {
                 if (usernameParam.length > 1) {
                     switch (usernameParam[1]) {
                         case "wxwork":
-                            accessRequest.setAuthProtocol("pap");
-                            accessRequest.setUserPassword(usernameParam[2]);
-                            break;
                         case "sms":
                             accessRequest.setAuthProtocol("pap");
-                            String plaintext = this.getUserPassword(usernameParam[0]);
-                            accessRequest.setUserPassword(this.getUserPassword(usernameParam[0]));
-                            if (plaintext != null && accessRequest.verifyPassword(plaintext)) {
-                                packet.setPacketType(RadiusPacket.ACCESS_ACCEPT);
-                            }
+                            packet.setPacketType(RadiusPacket.ACCESS_ACCEPT);
                             break;
                         default:
                             usernameParam[1] = "account";
@@ -92,7 +86,7 @@ public class PortalRadiusService {
                 portalAuthenticationMapper.insert(PortalAuthenticationEntry.builder()
                         .ip(ip)
                         .mac(mac)
-                        .type(usernameParam[1])
+                        .type(usernameParam.length > 1 ? usernameParam[1] : "default")
                         .sessionId(sessionId)
                         .build());
                 return packet;
