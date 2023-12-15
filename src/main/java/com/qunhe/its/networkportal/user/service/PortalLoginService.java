@@ -3,7 +3,6 @@ package com.qunhe.its.networkportal.user.service;
 import com.qunhe.its.networkportal.common.PortalAcErrorCode;
 import com.qunhe.its.networkportal.common.PortalException;
 import com.qunhe.its.networkportal.user.mapper.PortalAcctOnlineMapper;
-import com.qunhe.its.networkportal.user.mapper.PortalActMapper;
 import com.qunhe.its.networkportal.user.mapper.PortalAuthenticationMapper;
 import com.qunhe.its.networkportal.user.model.MobileAuthReqVo;
 import com.qunhe.its.networkportal.user.model.entry.PortalAcctOnlineEntry;
@@ -11,6 +10,7 @@ import com.qunhe.its.networkportal.user.utils.PortalCacheUtils;
 import com.qunhe.its.networkportal.user.utils.PortalMessageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,8 +26,12 @@ import java.util.Objects;
 @Slf4j
 public class PortalLoginService {
 
-    private static final String AC_IP = "10.10.200.55";
-    private static final Integer AC_PORT = 2000;
+
+    @Value("${nas.ip}")
+    private String acIp;
+
+    @Value("${nas.port}")
+    private Integer nasPort;
 
     @Autowired
     private MessageSmsService messageSmsService;
@@ -61,8 +65,8 @@ public class PortalLoginService {
         PortalMessageUtils sender = new PortalMessageUtils();
         byte[] buff = sender.init(vo.getUserIp(), 1, 0, 1024);
         sender.setTimeout(3000);
-        sender.setAcIp(AC_IP);
-        sender.setAcPort(AC_PORT);
+        sender.setAcIp(acIp);
+        sender.setAcPort(nasPort);
         sender.setDataSocket(new DatagramSocket());
         // 发送 Challenge 包，进行校验
         byte[] ackData = sender.sendChallengeReqAuth(buff);
@@ -99,8 +103,8 @@ public class PortalLoginService {
         PortalMessageUtils sender = new PortalMessageUtils();
         byte[] buff = sender.init(vo.getUserIp(), 1, 1, 1024);
         sender.setTimeout(300000);
-        sender.setAcIp(AC_IP);
-        sender.setAcPort(AC_PORT);
+        sender.setAcIp(acIp);
+        sender.setAcPort(nasPort);
         sender.setDataSocket(new DatagramSocket());
         // 发送认证请求报文
         byte[] ackData = sender.sendReqAuthByPap(vo.getLoginName(), vo.getPassword(), buff);
@@ -122,8 +126,8 @@ public class PortalLoginService {
         PortalMessageUtils sender = new PortalMessageUtils();
         byte[] buff = sender.init(vo.getUserIp(), 1, 0, 16);
         sender.setTimeout(3000);
-        sender.setAcIp(AC_IP);
-        sender.setAcPort(AC_PORT);
+        sender.setAcIp(acIp);
+        sender.setAcPort(nasPort);
         sender.setDataSocket(new DatagramSocket());
         sender.sendLogoutReqAuth(buff);
     }
@@ -138,8 +142,8 @@ public class PortalLoginService {
         PortalMessageUtils sender = new PortalMessageUtils();
         byte[] buff = sender.init(vo.getUserIp(), 1, 0, 16);
         sender.setTimeout(3000);
-        sender.setAcIp(AC_IP);
-        sender.setAcPort(AC_PORT);
+        sender.setAcIp(acIp);
+        sender.setAcPort(nasPort);
         sender.setDataSocket(new DatagramSocket());
         sender.sendLogoutReqAuth(buff);
         portalAuthenticationMapper.downlineByIpAndMac(vo.getUserIp(), vo.getDeviceMac());

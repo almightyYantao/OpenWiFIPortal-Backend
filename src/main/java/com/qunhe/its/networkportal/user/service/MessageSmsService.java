@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.qunhe.its.networkportal.user.model.MobileSmsCodeReqVo;
 import com.qunhe.its.networkportal.common.HttpUtil;
 import com.qunhe.its.networkportal.user.utils.PortalCacheUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,6 +18,12 @@ import java.util.Map;
 @Service
 public class MessageSmsService {
 
+    @Value("${sms.type}")
+    private String smsType;
+
+    @Value("${sms.url:#{null}}")
+    private String smsUrl;
+
     /**
      * 发送短信验证码
      *
@@ -29,7 +36,7 @@ public class MessageSmsService {
         json.put("phone", mobileSmsCodeReqVo.getPhone());
         int verificationCode = PortalCacheUtils.generateAndCacheVerificationCode(mobileSmsCodeReqVo.getPhone());
         json.put("content", "验证码" + verificationCode + "是您本次的 Wi-Fi 登录凭证，2 分钟内有效，请您查收");
-        httpUtil.doPostJson("https://complex.qunhequnhe.com/api/v1/visitor/send", JSONObject.toJSONString(json), new HashMap<>());
+        httpUtil.doPostJson(smsUrl, JSONObject.toJSONString(json), new HashMap<>());
     }
 
     /**
